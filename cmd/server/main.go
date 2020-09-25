@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"git.ixarea.com/p2pNG/p2pNG-core/components/certificate"
+	"git.ixarea.com/p2pNG/p2pNG-core/modules/discovery"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/echo/v4"
 	"os"
@@ -10,7 +11,17 @@ import (
 )
 
 func main() {
+	go StartHttpServer()
+	go func() {
+		_, _ = discovery.LocalBroadcast(8443)
+	}()
+	sign := make(chan os.Signal, 1)
+	signal.Notify(sign, os.Interrupt, os.Kill)
+	<-sign
 
+}
+
+func StartHttpServer() {
 	_, _ = certificate.GetCert("server", "Server Certificate")
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
@@ -24,8 +35,4 @@ func main() {
 	e.Server.TLSConfig.ClientAuth = tls.RequireAnyClientCert
 	e.Server.Addr = ":8443"
 	_ = e.Server.ListenAndServeTLS(certificate.GetCertFilename("server"), certificate.GetCertKeyFilename("server"))
-
-	sign := make(chan os.Signal, 1)
-	signal.Notify(sign, os.Interrupt, os.Kill)
-	<-sign
 }

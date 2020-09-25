@@ -4,18 +4,25 @@ import (
 	"crypto/tls"
 	"fmt"
 	"git.ixarea.com/p2pNG/p2pNG-core/components/certificate"
-	"github.com/labstack/gommon/log"
+	"git.ixarea.com/p2pNG/p2pNG-core/modules/discovery"
+	"git.ixarea.com/p2pNG/p2pNG-core/utils"
+	"go.uber.org/zap"
 	"io/ioutil"
+	"net"
 	"net/http"
 )
 
 func main() {
-	log.EnableColor()
-	log.Info("Hello")
+	utils.Log().Info("Hello")
+	clients, err := discovery.LocalScan()
+	if err != nil {
+		utils.Log().Error("scan local peer failed", zap.Error(err))
+	}
+
 	_, _ = certificate.GetCert("client", "Client Certificate")
 	cert, err := tls.LoadX509KeyPair(certificate.GetCertFilename("client"), certificate.GetCertKeyFilename("client"))
 	if err != nil {
-		log.Error(err)
+		utils.Log().Error("generate local certificate failed", zap.Error(err))
 	}
 	client := http.Client{Transport: &http.Transport{
 		TLSClientConfig: &tls.Config{
@@ -23,7 +30,14 @@ func main() {
 			Certificates:       []tls.Certificate{cert},
 		},
 	}}
-	resp, _ := client.Get("https://127.0.0.1:8443/")
-	text, _ := ioutil.ReadAll(resp.Body)
-	fmt.Print(string(text))
+	for cIdx := range clients {
+		c := clients[cIdx]
+		addr := net.TCPAddr{IP: c.Addr, Port: c.Port}
+		endpoint := fmt.Sprintf("https://%s/", addr.String())
+		utils.Log().Info("Connecting to " + endpoint)
+		resp, _ := client.Get(endpoint)
+		text, _ := ioutil.ReadAll(resp.Body)
+		fmt.Print(string(text))
+	}
+
 }
