@@ -1,7 +1,6 @@
 package certificate
 
 import (
-	"crypto/ed25519"
 	"crypto/rand"
 	"crypto/x509"
 	"encoding/pem"
@@ -64,13 +63,20 @@ func createCert(name, subject string) ([]byte, error) {
 	parCert := x.GetRaw()
 	x.AuthorityKeyId = sub.GetKeyId()
 
-	//todo: Change This If need
+	/*todo: Change This If need
 	x.SetAlgorithm("ed25519", "")
 	privObj, err := x509.ParsePKCS8PrivateKey(priv)
 	if err != nil {
 		return nil, err
 	}
 	der, err := x509.CreateCertificate(rand.Reader, x.GetRaw(), parCert, privObj.(ed25519.PrivateKey).Public(), privObj)
+	*/
+	x.SetAlgorithm("ecdsa", "sha256")
+	privObj, err := x509.ParseECPrivateKey(priv)
+	if err != nil {
+		return nil, err
+	}
+	der, err := x509.CreateCertificate(rand.Reader, x.GetRaw(), parCert, privObj.Public(), privObj)
 
 	certPem := Der2Pem(der, "CERTIFICATE")
 
@@ -95,7 +101,8 @@ func GetCertKey(name string) (key []byte, err error) {
 }
 
 func createCertKey(name string) ([]byte, error) {
-	priv := wrapCert.CreateKey("ed25519", 0)
+	//priv := wrapCert.CreateKey("ed25519", 0)
+	priv := wrapCert.CreateKey("ecdsa", 256)
 	privPem := Der2Pem(priv, "PRIVATE KEY")
 	_ = ioutil.WriteFile(GetCertKeyFilename(name), []byte(privPem), os.ModePerm)
 

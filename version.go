@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	AppName          string = "CrawlerDaemon"
+	AppName          string = "p2pNG-core"
 	AppIntroduction  string = "Next Generation Peer-to-Peer Network Core."
 	LongIntroduction string = "p2pNG-core is universal platform for peer to peer network.\n" +
 		"It is going to implements all the basic components of our p2pNG Protocol."

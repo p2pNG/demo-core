@@ -3,8 +3,10 @@ package main
 import (
 	"crypto/tls"
 	"git.ixarea.com/p2pNG/p2pNG-core/components/certificate"
+	"git.ixarea.com/p2pNG/p2pNG-core/modules/debug"
 	"git.ixarea.com/p2pNG/p2pNG-core/modules/discovery"
-	"github.com/davecgh/go-spew/spew"
+	"git.ixarea.com/p2pNG/p2pNG-core/modules/status"
+	"git.ixarea.com/p2pNG/p2pNG-core/utils"
 	"github.com/labstack/echo/v4"
 	"os"
 	"os/signal"
@@ -22,17 +24,28 @@ func main() {
 }
 
 func StartHttpServer() {
-	_, _ = certificate.GetCert("server", "Server Certificate")
+	_, _ = certificate.GetCert("server", utils.GetHostname()+" Server")
 	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
-		x := spew.Sdump(c.Request().TLS.PeerCertificates)
-		return c.String(200, x)
-	})
-	if e.Server.TLSConfig == nil {
-		e.Server.TLSConfig = &tls.Config{}
-	}
+	api := e.Group("")
+	status.GetRouter(api)
+	debug.GetRouter(api)
+	_ = ReallyStartTlsSServer(e, ":8443")
+}
 
-	e.Server.TLSConfig.ClientAuth = tls.RequireAnyClientCert
-	e.Server.Addr = ":8443"
-	_ = e.Server.ListenAndServeTLS(certificate.GetCertFilename("server"), certificate.GetCertKeyFilename("server"))
+func ReallyStartTlsSServer(e *echo.Echo, address string) (err error) {
+	s := e.TLSServer
+	s.TLSConfig = new(tls.Config)
+	s.TLSConfig.Certificates = make([]tls.Certificate, 1)
+	cert := certificate.GetCertFilename("server")
+	key := certificate.GetCertKeyFilename("server")
+	if s.TLSConfig.Certificates[0], err = tls.LoadX509KeyPair(cert, key); err != nil {
+		return
+	}
+	s.TLSConfig.ClientAuth = tls.RequireAnyClientCert
+
+	s.Addr = address
+	if !e.DisableHTTP2 {
+		s.TLSConfig.NextProtos = append(s.TLSConfig.NextProtos, "h2")
+	}
+	return e.StartServer(e.TLSServer)
 }
