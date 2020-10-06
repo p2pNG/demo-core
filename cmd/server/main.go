@@ -8,6 +8,7 @@ import (
 	"git.ixarea.com/p2pNG/p2pNG-core/modules/discovery"
 	"git.ixarea.com/p2pNG/p2pNG-core/modules/manage"
 	"git.ixarea.com/p2pNG/p2pNG-core/modules/status"
+	"git.ixarea.com/p2pNG/p2pNG-core/modules/transfer"
 	"git.ixarea.com/p2pNG/p2pNG-core/utils"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -44,6 +45,7 @@ func StartHttpServer() {
 	status.GetRouter(api)
 	debug.GetRouter(api)
 	manage.GetRouter(api)
+	transfer.GetRouter(api)
 	_ = ReallyStartTlsServer(e, ":8443")
 }
 

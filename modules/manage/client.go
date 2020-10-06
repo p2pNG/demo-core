@@ -2,7 +2,6 @@ package manage
 
 import (
 	"git.ixarea.com/p2pNG/p2pNG-core/components/request"
-	"github.com/davecgh/go-spew/spew"
 	"io/ioutil"
 	"net"
 	"net/url"
@@ -11,7 +10,6 @@ import (
 func AddLocalFile(tcpAddr net.TCPAddr, filepath string) (data string, err error) {
 	qry := url.Values{"path": []string{filepath}}
 	endpoint := url.URL{Scheme: "https", Host: tcpAddr.String(), Path: "/manage/add-file", RawQuery: qry.Encode()}
-	spew.Dump(endpoint.String())
 
 	client, err := request.GetDefaultHttpClient()
 	if err != nil {

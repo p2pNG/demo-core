@@ -4,6 +4,7 @@ import (
 	"git.ixarea.com/p2pNG/p2pNG-core/components/certificate"
 	"git.ixarea.com/p2pNG/p2pNG-core/modules/discovery"
 	"git.ixarea.com/p2pNG/p2pNG-core/modules/status"
+	"git.ixarea.com/p2pNG/p2pNG-core/modules/transfer"
 	"git.ixarea.com/p2pNG/p2pNG-core/utils"
 	"github.com/davecgh/go-spew/spew"
 	"go.uber.org/zap"
@@ -31,7 +32,15 @@ func main() {
 		utils.Log().Info("Found Local Service:", zap.String("addr", tcpAddr.String()))
 		spew.Dump(status.GetNodeInfo(tcpAddr))
 		//spew.Dump(manage.AddLocalFile(tcpAddr, "D:/temp/bank-proj/Release/package"))
-		spew.Dump(status.ListAvailableSeeds(tcpAddr))
+		seeds, err := status.ListAvailableSeeds(tcpAddr)
+		if err != nil {
+			utils.Log().Error("failed to list peer owning seeds", zap.Error(err))
+		}
+		spew.Dump(seeds)
+		for seedIdx := range seeds {
+			seed := seeds[seedIdx]
+			spew.Dump(transfer.GetSeed(tcpAddr, seed))
+		}
 	}
 
 }
