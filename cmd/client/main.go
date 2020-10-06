@@ -16,6 +16,9 @@ func main() {
 	if err != nil {
 		utils.Log().Error("scan local peer failed", zap.Error(err))
 	}
+	if err != nil {
+		utils.Log().Fatal("open database", zap.Error(err))
+	}
 
 	_, err = certificate.GetCert("client", utils.GetHostname()+" Client")
 	if err != nil {
@@ -27,6 +30,8 @@ func main() {
 		tcpAddr := net.TCPAddr{IP: c.Addr, Port: c.Port}
 		utils.Log().Info("Found Local Service:", zap.String("addr", tcpAddr.String()))
 		spew.Dump(status.GetNodeInfo(tcpAddr))
+		//spew.Dump(manage.AddLocalFile(tcpAddr, "D:/temp/bank-proj/Release/package"))
+		spew.Dump(status.ListAvailableSeeds(tcpAddr))
 	}
 
 }

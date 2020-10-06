@@ -14,4 +14,5 @@ type CoreInfo struct {
 func GetRouter(e *echo.Group) {
 	g := e.Group("/status")
 	g.GET("/info", getNodeInfo)
+	g.GET("/seeds", listAvailableSeeds)
 }
