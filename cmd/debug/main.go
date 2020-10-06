@@ -1,16 +1,13 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"git.ixarea.com/p2pNG/p2pNG-core/components/file_store"
+	"git.ixarea.com/p2pNG/p2pNG-core/modules/status"
 	"github.com/davecgh/go-spew/spew"
+	"net"
 )
 
 func main() {
-	//F:/Installer/System/cn_windows_10_consumer_editions_version_2004_updated_sep_2020_x64_dvd_049d70ee.iso
-	data, err := file_store.StatLocalFile("D:/temp/bank-proj/Release/package", 0)
-	spew.Dump(data, err)
-	dataJson, err := json.Marshal(data)
-	fmt.Print(string(dataJson))
+	spew.Dump(status.GetNodeInfo(net.TCPAddr{IP: net.ParseIP("192.168.31.10"), Port: 8444}))
+	spew.Dump(status.GetNodeInfo(net.TCPAddr{IP: net.ParseIP("192.168.31.10"), Port: 8443}))
+
 }

@@ -15,11 +15,18 @@ func openDB() (err error) {
 	return
 }
 
+var defaultBuckets = []string{"file", "discovery_registry"}
+
 func initBuckets() (err error) {
 	if defaultDBEngine != nil {
 		err = defaultDBEngine.Update(func(tx *bolt.Tx) error {
-			_, err := tx.CreateBucketIfNotExists([]byte("file"))
-			return err
+			for bukIdx := range defaultBuckets {
+				_, err := tx.CreateBucketIfNotExists([]byte(defaultBuckets[bukIdx]))
+				if err != nil {
+					return err
+				}
+			}
+			return nil
 		})
 	}
 	return

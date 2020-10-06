@@ -3,11 +3,12 @@ package status
 import (
 	"encoding/json"
 	"git.ixarea.com/p2pNG/p2pNG-core/components/request"
+	"git.ixarea.com/p2pNG/p2pNG-core/model"
 	"io/ioutil"
 	"net"
 )
 
-func GetNodeInfo(tcpAddr net.TCPAddr) (info NodeInfo, err error) {
+func GetNodeInfo(tcpAddr net.TCPAddr) (info *model.NodeInfo, err error) {
 	endpoint := "/status/info"
 
 	client, err := request.GetDefaultHttpClient()
@@ -24,8 +25,8 @@ func GetNodeInfo(tcpAddr net.TCPAddr) (info NodeInfo, err error) {
 	if err != nil {
 		return
 	}
-	info = NodeInfo{}
-	err = json.Unmarshal(text, &info)
+	info = new(model.NodeInfo)
+	err = json.Unmarshal(text, info)
 	return
 }
 

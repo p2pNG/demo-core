@@ -4,11 +4,8 @@ import (
 	"crypto/tls"
 	"git.ixarea.com/p2pNG/p2pNG-core/components/certificate"
 	"git.ixarea.com/p2pNG/p2pNG-core/components/database"
-	"git.ixarea.com/p2pNG/p2pNG-core/modules/debug"
 	"git.ixarea.com/p2pNG/p2pNG-core/modules/discovery"
-	"git.ixarea.com/p2pNG/p2pNG-core/modules/manage"
 	"git.ixarea.com/p2pNG/p2pNG-core/modules/status"
-	"git.ixarea.com/p2pNG/p2pNG-core/modules/transfer"
 	"git.ixarea.com/p2pNG/p2pNG-core/utils"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -31,7 +28,7 @@ func main() {
 
 	go StartHttpServer()
 	go func() {
-		_, err = discovery.LocalBroadcast(8443)
+		_, err = discovery.LocalBroadcast(8444)
 		if err != nil {
 			utils.Log().Fatal("init mDNS service error", zap.Error(err))
 		}
@@ -48,10 +45,8 @@ func StartHttpServer() {
 	e.Use(middleware.Logger(), middleware.Gzip()) //, middleware.Recover())
 	api := e.Group("")
 	status.GetRouter(api)
-	debug.GetRouter(api)
-	manage.GetRouter(api)
-	transfer.GetRouter(api)
-	_ = ReallyStartTlsServer(e, ":8443")
+	discovery.GetRouter(api)
+	_ = ReallyStartTlsServer(e, ":8444")
 }
 
 func ReallyStartTlsServer(e *echo.Echo, address string) (err error) {

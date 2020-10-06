@@ -3,29 +3,14 @@ package file_store
 import (
 	"crypto/sha512"
 	"errors"
+	"git.ixarea.com/p2pNG/p2pNG-core/model"
 	"io"
 	"os"
-	"time"
 )
-
-type FileInfo struct {
-	Name string
-	Size int64
-	Hash []byte
-
-	BlockSize int64
-	BlockHash [][]byte
-}
-
-type LocalFileInfo struct {
-	FileInfo
-	Path       string
-	LastModify time.Time
-}
 
 const DefaultHashBufferSize = 4 * 1024 * 1024
 
-func StatLocalFile(filepath string, blockSize int64) (lf *LocalFileInfo, err error) {
+func StatLocalFile(filepath string, blockSize int64) (lf *model.LocalFileInfo, err error) {
 	stat, err := os.Stat(filepath)
 	if err != nil {
 		return
@@ -39,13 +24,13 @@ func StatLocalFile(filepath string, blockSize int64) (lf *LocalFileInfo, err err
 		return
 	}
 
-	lf = new(LocalFileInfo)
+	lf = new(model.LocalFileInfo)
 	lf.FileInfo = *fi
 	lf.LastModify = stat.ModTime()
 	lf.Path = filepath
 	return
 }
-func StatFile(filepath string, blockSize int64) (fi *FileInfo, err error) {
+func StatFile(filepath string, blockSize int64) (fi *model.FileInfo, err error) {
 	if blockSize <= 1024*1024 {
 		blockSize = DefaultHashBufferSize
 	}
@@ -58,7 +43,7 @@ func StatFile(filepath string, blockSize int64) (fi *FileInfo, err error) {
 		err = errors.New("not a valid file")
 		return
 	}
-	fi = new(FileInfo)
+	fi = new(model.FileInfo)
 	fi.BlockSize = blockSize
 	fi.Name, fi.Size = stat.Name(), stat.Size()
 

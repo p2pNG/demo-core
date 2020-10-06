@@ -3,14 +3,14 @@ package transfer
 import (
 	"encoding/base64"
 	"encoding/json"
-	"git.ixarea.com/p2pNG/p2pNG-core/components/file_store"
 	"git.ixarea.com/p2pNG/p2pNG-core/components/request"
+	"git.ixarea.com/p2pNG/p2pNG-core/model"
 	"io/ioutil"
 	"net"
 	"net/url"
 )
 
-func GetSeed(tcpAddr net.TCPAddr, hash []byte) (seeds *file_store.FileInfo, err error) {
+func GetSeed(tcpAddr net.TCPAddr, hash []byte) (seeds *model.FileInfo, err error) {
 	endpoint := url.URL{Scheme: "https", Host: tcpAddr.String(), Path: "/transfer/seed/" + base64.RawURLEncoding.EncodeToString(hash)}
 
 	client, err := request.GetDefaultHttpClient()
@@ -27,7 +27,7 @@ func GetSeed(tcpAddr net.TCPAddr, hash []byte) (seeds *file_store.FileInfo, err 
 	if err != nil {
 		return
 	}
-	seeds = new(file_store.FileInfo)
+	seeds = new(model.FileInfo)
 	err = json.Unmarshal(text, seeds)
 	return
 }
