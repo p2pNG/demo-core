@@ -2,6 +2,7 @@ package main
 
 import (
 	"git.ixarea.com/p2pNG/p2pNG-core/components/certificate"
+	"git.ixarea.com/p2pNG/p2pNG-core/components/file_store"
 	"git.ixarea.com/p2pNG/p2pNG-core/modules/discovery"
 	"git.ixarea.com/p2pNG/p2pNG-core/modules/status"
 	"git.ixarea.com/p2pNG/p2pNG-core/modules/transfer"
@@ -35,11 +36,25 @@ func main() {
 		seeds, err := status.ListAvailableSeeds(tcpAddr)
 		if err != nil {
 			utils.Log().Error("failed to list peer owning seeds", zap.Error(err))
+			continue
 		}
 		spew.Dump(seeds)
 		for seedIdx := range seeds {
-			seed := seeds[seedIdx]
-			spew.Dump(transfer.GetSeed(tcpAddr, seed))
+			seed, err := transfer.GetSeed(tcpAddr, seeds[seedIdx])
+			if err != nil {
+				utils.Log().Error("failed to get seed content", zap.Error(err))
+				continue
+			}
+			spew.Dump(seed)
+			for blockIdx := range seed.BlockHash {
+				block, err := transfer.DownloadFileBlock(tcpAddr, seeds[seedIdx], seed.BlockHash[blockIdx])
+				if err != nil {
+					utils.Log().Error("failed to download file content", zap.Error(err))
+				}
+				spew.Dump(len(block) == file_store.DefaultHashBufferSize)
+				break
+
+			}
 		}
 	}
 
