@@ -19,6 +19,7 @@ import (
 func GetRouter(e *echo.Group) {
 	g := e.Group("/discovery")
 	g.POST("/register", registerClient)
+	g.GET("/peers", listAvailablePeers)
 }
 
 func registerClient(c echo.Context) error {
@@ -91,4 +92,52 @@ func RegisterClient(addr net.TCPAddr, listenPort int) (success bool, err error) 
 		return
 	}
 	return false, stdErr
+}
+
+func listAvailablePeers(c echo.Context) error {
+	db, err := database.GetDBEngine()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError,
+			model.StandardError{Code: 2, Message: "connect to database error", Internal: err.Error()})
+	}
+	var data []string
+	err = db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte("discovery_registry"))
+		return bucket.ForEach(func(k, _ []byte) error {
+			data = append(data, string(k))
+			return nil
+		})
+	})
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError,
+			model.StandardError{Code: 5, Message: "read from database error", Internal: err.Error()})
+	}
+	return c.JSON(http.StatusOK, data)
+
+}
+
+func ListAvailablePeers(tcpAddr net.TCPAddr) (seeds []string, err error) {
+	endpoint := "/discovery/peers"
+
+	client, err := request.GetDefaultHttpClient()
+	if err != nil {
+		return
+	}
+
+	resp, err := client.Get("https://" + tcpAddr.String() + endpoint)
+	if err != nil {
+		return
+	}
+
+	text, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	seeds = []string{}
+	err = json.Unmarshal(text, &seeds)
+	return
+}
+
+func checkClientAlive() {
+
 }
