@@ -11,6 +11,7 @@ import (
 	"git.ixarea.com/p2pNG/p2pNG-core/utils"
 	"github.com/labstack/echo/v4"
 	bolt "go.etcd.io/bbolt"
+	"go.uber.org/zap"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -138,6 +139,27 @@ func ListAvailablePeers(tcpAddr net.TCPAddr) (seeds []string, err error) {
 	return
 }
 
-func checkClientAlive() {
+func EnsureClientAlive() (err error) {
+	db, err := database.GetDBEngine()
+	if err != nil {
+		return
+	}
 
+	err = db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte("discovery_registry"))
+		return bucket.ForEach(func(k, _ []byte) error {
+			addr, err := net.ResolveTCPAddr("tcp", string(k))
+			if err != nil {
+				return err
+			}
+			_, err = status.GetNodeInfo(*addr)
+			//todo: Reserve Offline Clients For
+			if err != nil {
+				utils.Log().Debug("Deleting", zap.Binary("key", k))
+				_ = bucket.Delete(k)
+			}
+			return nil
+		})
+	})
+	return
 }

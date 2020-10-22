@@ -25,7 +25,7 @@ func main() {
 		utils.Log().Fatal("init database error", zap.Error(err))
 	}
 	defer database.CloseDBEngine()
-
+	discovery.EnsureClientAlive()
 	go StartHttpServer()
 	go func() {
 		_, err = discovery.LocalBroadcast(8444)
