@@ -7,10 +7,16 @@ import (
 	"git.ixarea.com/p2pNG/p2pNG-core/model"
 	"github.com/labstack/echo/v4"
 	bolt "go.etcd.io/bbolt"
+	"net"
 	"net/http"
 )
 
 func addLocalFile(c echo.Context) error {
+	if !net.ParseIP(c.RealIP()).IsLoopback() {
+		return c.JSON(http.StatusInternalServerError,
+			model.StandardError{Code: 16, Message: "should called by loopback ip"},
+		)
+	}
 	p := c.QueryParam("path")
 	f, err := file_store.StatLocalFile(p, 0)
 	if err != nil {

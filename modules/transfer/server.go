@@ -69,7 +69,7 @@ func downloadFileBlock(c echo.Context) error {
 			err = errors.New("incorrect hash length")
 		}
 		return c.JSON(http.StatusBadRequest,
-			model.StandardError{Code: 6, Message: "parse block hash error", Internal: err.Error()})
+			model.StandardError{Code: 13, Message: "parse block hash error", Internal: err.Error()})
 	}
 
 	db, err := database.GetDBEngine()
