@@ -26,6 +26,8 @@ func main() {
 	if err != nil {
 		utils.Log().Fatal("generate local certificate failed", zap.Error(err))
 	}
+	pfx, err := certificate.GetCertBundle("client", utils.GetHostname()+" Client")
+	spew.Dump(pfx, err)
 
 	for cIdx := range clients {
 		c := clients[cIdx]

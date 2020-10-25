@@ -10,6 +10,7 @@ import (
 	rand2 "math/rand"
 	"os"
 	"path"
+	"software.sslmate.com/src/go-pkcs12"
 )
 
 func GetCertFilename(name string) string {
@@ -27,9 +28,32 @@ func GetCertBundleFilename(name string) string {
 	_ = os.MkdirAll(basePath, 0755)
 	return path.Join(basePath, name+".pfx")
 }
-func GetCertBundle(name string) {
 
+func GetCertBundle(name string, subject string) ([]byte, error) {
+	certFile := GetCertBundleFilename(name)
+	_, err := os.Stat(certFile)
+	if os.IsNotExist(err) {
+		return createCertBundle(name, subject)
+	} else {
+		return ioutil.ReadFile(certFile)
+	}
 }
+func createCertBundle(name string, subject string) ([]byte, error) {
+	privDer, err := GetCertKey(name)
+	if err != nil {
+		return nil, err
+	}
+
+	cert, err := GetCert(name, subject)
+	if err != nil {
+		return nil, err
+	}
+	priv, err := x509.ParseECPrivateKey(privDer)
+	pfx, err := pkcs12.Encode(rand.Reader, priv, cert, nil, "")
+	_ = ioutil.WriteFile(GetCertBundleFilename(name), pfx, os.ModePerm)
+	return pfx, err
+}
+
 func GetCert(name, subject string) (*x509.Certificate, error) {
 	certFile := GetCertFilename(name)
 	_, err := os.Stat(certFile)

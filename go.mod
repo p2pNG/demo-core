@@ -14,4 +14,5 @@ require (
 	golang.org/x/sys v0.0.0-20200909081042-eff7692f9009 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
+	software.sslmate.com/src/go-pkcs12 v0.0.0-20200830195227-52f69702a001
 )
