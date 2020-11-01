@@ -1,4 +1,4 @@
-package p2pNG_core
+package core
 
 import (
 	"fmt"

@@ -2,17 +2,23 @@ package main
 
 import (
 	"crypto/tls"
+	"errors"
+	"git.ixarea.com/p2pNG/p2pNG-core"
+	_ "git.ixarea.com/p2pNG/p2pNG-core/cmd/plugins"
 	"git.ixarea.com/p2pNG/p2pNG-core/components/certificate"
 	"git.ixarea.com/p2pNG/p2pNG-core/components/database"
 	"git.ixarea.com/p2pNG/p2pNG-core/modules/discovery"
-	"git.ixarea.com/p2pNG/p2pNG-core/modules/status"
 	"git.ixarea.com/p2pNG/p2pNG-core/utils"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"go.uber.org/zap"
 	"os"
 	"os/signal"
+	"strconv"
+	"time"
 )
+
+const ListenPort = 6444
 
 func main() {
 	err := os.MkdirAll(utils.AppDataDir(), 0755)
@@ -25,10 +31,23 @@ func main() {
 		utils.Log().Fatal("init database error", zap.Error(err))
 	}
 	defer database.CloseDBEngine()
-	discovery.EnsureClientAlive()
-	go StartHttpServer()
 	go func() {
-		_, err = discovery.LocalBroadcast(8444)
+		for {
+			err := discovery.EnsureClientAlive()
+			if err != nil {
+				utils.Log().Error("check clients failed", zap.Error(err))
+			}
+			time.Sleep(time.Minute)
+		}
+	}()
+	go func() {
+		err := StartHttpServer()
+		if err != nil {
+			utils.Log().Fatal("init mDNS service error", zap.Error(err))
+		}
+	}()
+	go func() {
+		_, err = discovery.LocalBroadcast(ListenPort)
 		if err != nil {
 			utils.Log().Fatal("init mDNS service error", zap.Error(err))
 		}
@@ -39,14 +58,24 @@ func main() {
 
 }
 
-func StartHttpServer() {
+func StartHttpServer() error {
 	_, _ = certificate.GetCert("server", utils.GetHostname()+" Server")
 	e := echo.New()
-	e.Use(middleware.Logger(), middleware.Gzip()) //, middleware.Recover())
+	e.Use(middleware.Logger(), middleware.Gzip(), middleware.Recover())
 	api := e.Group("")
-	status.GetRouter(api)
-	discovery.GetRouter(api)
-	_ = ReallyStartTlsServer(e, ":8444")
+	plugins := []string{"Discovery", "Status"}
+	for nameIdx := range plugins {
+		name := plugins[nameIdx]
+		p, ok := core.GetRouterPlugin(name)
+		if !ok {
+			return errors.New("unregistered plugin: " + name)
+		}
+		info := p.PluginInfo()
+		utils.Log().Info("loading router plugin", zap.String("plugin", name))
+		p.GetRouter(api.Group(info.Prefix))
+	}
+	_ = ReallyStartTlsServer(e, ":"+strconv.Itoa(ListenPort))
+	return nil
 }
 
 func ReallyStartTlsServer(e *echo.Echo, address string) (err error) {
