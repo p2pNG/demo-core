@@ -1,7 +1,7 @@
 package core
 
 import (
-	"git.ixarea.com/p2pNG/p2pNG-core/model"
+	"github.com/p2pNG/core/model"
 )
 
 var plugins map[string]model.RouterPlugin

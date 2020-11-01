@@ -1,11 +1,11 @@
 package status
 
 import (
-	core "git.ixarea.com/p2pNG/p2pNG-core"
-	"git.ixarea.com/p2pNG/p2pNG-core/components/database"
-	"git.ixarea.com/p2pNG/p2pNG-core/model"
-	"git.ixarea.com/p2pNG/p2pNG-core/utils"
 	"github.com/labstack/echo/v4"
+	core "github.com/p2pNG/core"
+	"github.com/p2pNG/core/components/database"
+	"github.com/p2pNG/core/model"
+	"github.com/p2pNG/core/utils"
 	bolt "go.etcd.io/bbolt"
 	"net/http"
 )

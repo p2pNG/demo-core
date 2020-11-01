@@ -2,8 +2,8 @@ package request
 
 import (
 	"crypto/tls"
-	"git.ixarea.com/p2pNG/p2pNG-core/components/certificate"
-	"git.ixarea.com/p2pNG/p2pNG-core/utils"
+	"github.com/p2pNG/core/components/certificate"
+	"github.com/p2pNG/core/utils"
 	"net/http"
 )
 

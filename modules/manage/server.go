@@ -2,10 +2,10 @@ package manage
 
 import (
 	"encoding/json"
-	"git.ixarea.com/p2pNG/p2pNG-core/components/database"
-	"git.ixarea.com/p2pNG/p2pNG-core/components/file_store"
-	"git.ixarea.com/p2pNG/p2pNG-core/model"
 	"github.com/labstack/echo/v4"
+	"github.com/p2pNG/core/components/database"
+	"github.com/p2pNG/core/components/file_store"
+	"github.com/p2pNG/core/model"
 	bolt "go.etcd.io/bbolt"
 	"net"
 	"net/http"

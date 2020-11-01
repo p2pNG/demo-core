@@ -1,9 +1,9 @@
 package plugins
 
 import (
-	_ "git.ixarea.com/p2pNG/p2pNG-core/modules/debug"
-	_ "git.ixarea.com/p2pNG/p2pNG-core/modules/discovery"
-	_ "git.ixarea.com/p2pNG/p2pNG-core/modules/manage"
-	_ "git.ixarea.com/p2pNG/p2pNG-core/modules/status"
-	_ "git.ixarea.com/p2pNG/p2pNG-core/modules/transfer"
+	_ "github.com/p2pNG/core/modules/debug"
+	_ "github.com/p2pNG/core/modules/discovery"
+	_ "github.com/p2pNG/core/modules/manage"
+	_ "github.com/p2pNG/core/modules/status"
+	_ "github.com/p2pNG/core/modules/transfer"
 )

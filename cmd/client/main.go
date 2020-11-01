@@ -1,13 +1,13 @@
 package main
 
 import (
-	"git.ixarea.com/p2pNG/p2pNG-core/components/certificate"
-	"git.ixarea.com/p2pNG/p2pNG-core/components/file_store"
-	"git.ixarea.com/p2pNG/p2pNG-core/modules/discovery"
-	"git.ixarea.com/p2pNG/p2pNG-core/modules/status"
-	"git.ixarea.com/p2pNG/p2pNG-core/modules/transfer"
-	"git.ixarea.com/p2pNG/p2pNG-core/utils"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/p2pNG/core/components/certificate"
+	"github.com/p2pNG/core/components/file_store"
+	"github.com/p2pNG/core/modules/discovery"
+	"github.com/p2pNG/core/modules/status"
+	"github.com/p2pNG/core/modules/transfer"
+	"github.com/p2pNG/core/utils"
 	"go.uber.org/zap"
 	"net"
 )
@@ -26,8 +26,7 @@ func main() {
 	if err != nil {
 		utils.Log().Fatal("generate local certificate failed", zap.Error(err))
 	}
-	pfx, err := certificate.GetCertBundle("client", utils.GetHostname()+" Client")
-	spew.Dump(pfx, err)
+	_, _ = certificate.GetCertBundle("client", utils.GetHostname()+" Client")
 
 	for cIdx := range clients {
 		c := clients[cIdx]

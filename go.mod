@@ -1,4 +1,4 @@
-module git.ixarea.com/p2pNG/p2pNG-core
+module github.com/p2pNG/core
 
 go 1.15
 

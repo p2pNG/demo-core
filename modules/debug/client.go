@@ -1,7 +1,7 @@
 package debug
 
 import (
-	"git.ixarea.com/p2pNG/p2pNG-core/components/request"
+	"github.com/p2pNG/core/components/request"
 	"io/ioutil"
 	"net"
 )

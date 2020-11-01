@@ -1,9 +1,9 @@
 package transfer
 
 import (
-	"git.ixarea.com/p2pNG/p2pNG-core"
-	"git.ixarea.com/p2pNG/p2pNG-core/model"
 	"github.com/labstack/echo/v4"
+	"github.com/p2pNG/core"
+	"github.com/p2pNG/core/model"
 )
 
 type router struct{}

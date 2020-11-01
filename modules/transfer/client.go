@@ -3,8 +3,8 @@ package transfer
 import (
 	"encoding/base64"
 	"encoding/json"
-	"git.ixarea.com/p2pNG/p2pNG-core/components/request"
-	"git.ixarea.com/p2pNG/p2pNG-core/model"
+	"github.com/p2pNG/core/components/request"
+	"github.com/p2pNG/core/model"
 	"io/ioutil"
 	"net"
 	"net/url"

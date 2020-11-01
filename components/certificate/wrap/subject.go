@@ -8,7 +8,7 @@ import (
 	"crypto/sha256"
 	"crypto/x509/pkix"
 	"encoding/asn1"
-	"git.ixarea.com/p2pNG/p2pNG-core/utils"
+	"github.com/p2pNG/core/utils"
 	"go.uber.org/zap"
 )
 

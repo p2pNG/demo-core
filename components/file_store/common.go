@@ -3,7 +3,7 @@ package file_store
 import (
 	"crypto/sha512"
 	"errors"
-	"git.ixarea.com/p2pNG/p2pNG-core/model"
+	"github.com/p2pNG/core/model"
 	"io"
 	"os"
 )
